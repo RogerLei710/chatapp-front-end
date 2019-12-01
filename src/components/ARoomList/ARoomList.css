@@ -1,0 +1,12 @@
+.room-list {
+  display: flex;
+  flex-direction: column;
+  height: 50%;
+  border: 1px lightgray solid;
+}
+
+.scrollable {
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}

@@ -1,0 +1,31 @@
+.user-list-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.user-list-item:hover {
+  background: #eeeef1;
+  cursor: pointer;
+}
+
+.user-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.user-title {
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: capitalize;
+  margin: 0;
+}
+
+/* .user-snippet {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+  } */

@@ -1,0 +1,10 @@
+.user-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable {
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
