@@ -10,81 +10,7 @@ import "./MessageList.css";
 const MY_USER_ID = "apple";
 
 export default function MessageList(props) {
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    getMessages();
-  }, []);
-
-  const getMessages = () => {
-    var tempMessages = [
-      {
-        id: 1,
-        author: "apple",
-        message: "Hello everyone, welcome to Chaos chat app!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 2,
-        author: "orange",
-        message: "Jessie: My name is Jessie!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 3,
-        author: "orange",
-        message: "Jessie: So nice to chat with you!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 4,
-        author: "apple",
-        message:
-          "It is so nice to meet you. I am at Rice University. Do you know who I am? HAHAHAHAH. LOL. I want to have a chat with you.",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 5,
-        author: "apple",
-        message: "Do you like our design?",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 6,
-        author: "apple",
-        message:
-          "It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 7,
-        author: "orange",
-        message:
-          "Yudai: I think team chaos has great API design for certain. Yes, I like it. Would really love to choose it and implement it.",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 8,
-        author: "orange",
-        message: "Neo: Do you wanna to join me to watch the movie Joker",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 9,
-        author: "apple",
-        message: "I heard that this movie is wonderful and meaningful.",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 10,
-        author: "orange",
-        message:
-          "Yang: I think so. I have watched it though. Maybe we could try another one?",
-        timestamp: new Date().getTime()
-      }
-    ];
-    setMessages([...messages, ...tempMessages]);
-  };
+  const messages = props.messages;
 
   const renderMessages = () => {
     let i = 0;
@@ -92,51 +18,17 @@ export default function MessageList(props) {
     let tempMessages = [];
 
     while (i < messageCount) {
-      let previous = messages[i - 1];
       let current = messages[i];
-      let next = messages[i + 1];
       let isMine = current.author === MY_USER_ID;
-      let currentMoment = moment(current.timestamp);
-      let prevBySameAuthor = false;
-      let nextBySameAuthor = false;
-      let startsSequence = true;
-      let endsSequence = true;
-      let showTimestamp = true;
-
-      if (previous) {
-        let previousMoment = moment(previous.timestamp);
-        let previousDuration = moment.duration(
-          currentMoment.diff(previousMoment)
-        );
-        prevBySameAuthor = previous.author === current.author;
-
-        if (prevBySameAuthor && previousDuration.as("hours") < 1) {
-          startsSequence = false;
-        }
-
-        if (previousDuration.as("hours") < 1) {
-          showTimestamp = false;
-        }
-      }
-
-      if (next) {
-        let nextMoment = moment(next.timestamp);
-        let nextDuration = moment.duration(nextMoment.diff(currentMoment));
-        nextBySameAuthor = next.author === current.author;
-
-        if (nextBySameAuthor && nextDuration.as("hours") < 1) {
-          endsSequence = false;
-        }
-      }
 
       tempMessages.push(
         <Message
           key={i}
           isMine={isMine}
-          startsSequence={startsSequence}
-          endsSequence={endsSequence}
-          showTimestamp={showTimestamp}
+          showTimestamp={i % 5 == 0 ? true : false}
           data={current}
+          // startsSequence={startsSequence}
+          // endsSequence={endsSequence}
         />
       );
 
@@ -157,8 +49,11 @@ export default function MessageList(props) {
           // <ToolbarButton key="phone" icon="ion-ios-call" />
         ]}
       />
-
-      <div className="message-list-container">{renderMessages()}</div>
+      {messages === undefined ? (
+        <div></div>
+      ) : (
+        <div className="message-list-container">{renderMessages()}</div>
+      )}
 
       <Compose
         rightItems={[

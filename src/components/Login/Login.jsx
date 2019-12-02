@@ -6,8 +6,8 @@ class Login extends Component {
   state = {
     name: "",
     age: "",
-    continent: "",
-    school: "",
+    continent: "North America",
+    school: "Rice",
     warning: ""
   };
 
@@ -69,7 +69,6 @@ class Login extends Component {
                 </span>
                 <input
                   className="form-control"
-                  placeholder="Username"
                   required
                   name="name"
                   onChange={this.changeHandler}
@@ -79,9 +78,9 @@ class Login extends Component {
                 <label htmlFor="inputAge">Age</label>
                 <input
                   className="form-control"
-                  placeholder="Age"
                   required
                   name="age"
+                  type="number"
                   onChange={this.changeHandler}
                 ></input>
               </div>
@@ -94,8 +93,12 @@ class Login extends Component {
                   name="continent"
                   onChange={this.changeHandler}
                 >
-                  <option value="">Choose...</option>
-                  <option value="North America">North America</option>
+                  <option value="" disabled>
+                    Choose...
+                  </option>
+                  <option value="North America" selected>
+                    North America
+                  </option>
                   <option value="South America">South America</option>
                   <option value="Asia">Asia</option>
                   <option value="Ocean">Ocean</option>
@@ -112,11 +115,15 @@ class Login extends Component {
                   name="school"
                   onChange={this.changeHandler}
                 >
-                  <option value="">Choose...</option>
-                  <option value="Rice">Rice</option>
+                  <option value="" disabled>
+                    Choose...
+                  </option>
+                  <option value="Rice" selected>
+                    Rice
+                  </option>
                   <option value="Tsinghua">Tsinghua</option>
                   <option value="Stanford">Stanford</option>
-                  <option value="UESTC">UESTC</option>
+                  <option value="MIT">MIT</option>
                   <option value="Zhejiang">Zhejiang</option>
                 </select>
               </div>

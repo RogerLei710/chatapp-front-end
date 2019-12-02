@@ -13,9 +13,11 @@ export default function Users(props) {
       {/* <div className="conversation-list scrollable"> */}
 
       <Toolbar title={title} />
-      {users.map(user => (
-        <UserListItem key={user.name} data={user} />
-      ))}
+      {users === undefined ? (
+        <div></div>
+      ) : (
+        users.map(user => <UserListItem key={user.name} data={user} />)
+      )}
     </div>
   );
 }

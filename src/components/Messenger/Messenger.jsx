@@ -8,7 +8,6 @@ import UserList from "../UserList/UserList";
 import CMRoom from "../CMRoom/CMRoom";
 
 import "./Messenger.css";
-import axios from "axios";
 
 let client;
 
@@ -17,7 +16,7 @@ class Messenger extends Component {
     CMStatus: "none",
     myRooms: [],
     aRooms: [],
-    users: []
+    chooseRoom: ""
   };
 
   constructor(props) {
@@ -27,7 +26,6 @@ class Messenger extends Component {
 
     // Don't call this.setState() here!
     // this.state = { status: "" };
-    this.getUsers();
   }
 
   handleMsg = () => {
@@ -78,17 +76,18 @@ class Messenger extends Component {
     this.setState({ CMStatus: status });
   };
 
-  handleCMRoom = status => {
+  handleCMRoom = (status, info) => {
+    // for this project, we don't implement modification of room.
     if (status === "Create") {
       client.send(
         JSON.stringify({
           type: "createRoom",
           content: {
-            name: "roger",
-            minAge: 20,
-            maxAge: 30,
-            continent: ["North America", "South America"],
-            school: ["Rice", "Tsinghua"]
+            name: info.name,
+            minAge: info.minAge,
+            maxAge: info.maxAge,
+            continent: info.continent,
+            school: info.school
           }
         })
       );
@@ -130,10 +129,76 @@ class Messenger extends Component {
 
   createRoom = room => {
     let myRooms = this.state.myRooms;
-    room.icons = ["exit", "modify"];
-    room.chatHistory = [];
+    // room.icons = ["exit", "modify"];
+    room.icons = ["exit"];
+    room.chatHistory = [
+      {
+        id: 1,
+        author: "apple",
+        message: "Hello everyone, welcome to Chaos chat app!",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 2,
+        author: "orange",
+        message: "<strong>Jessie:</strong> My name is Jessie!",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 3,
+        author: "orange",
+        message: "Jessie: So nice to chat with you!",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 4,
+        author: "apple",
+        message:
+          "It is so nice to meet you. I am at Rice University. Do you know who I am? HAHAHAHAH. LOL. I want to have a chat with you.",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 5,
+        author: "apple",
+        message: "Do you like our design?",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 6,
+        author: "apple",
+        message:
+          "It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 7,
+        author: "orange",
+        message:
+          "Yudai: I think team chaos has great API design for certain. Yes, I like it. Would really love to choose it and implement it.",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 8,
+        author: "orange",
+        message: "Neo: Do you wanna to join me to watch the movie Joker",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 9,
+        author: "apple",
+        message: "I heard that this movie is wonderful and meaningful.",
+        timestamp: new Date().getTime()
+      },
+      {
+        id: 10,
+        author: "orange",
+        message:
+          "Yang: I think so. I have watched it though. Maybe we could try another one?",
+        timestamp: new Date().getTime()
+      }
+    ];
     myRooms.push(room);
-    this.setState({ myRooms });
+    this.setState({ myRooms, chooseRoom: room });
   };
 
   joinRoom = room => {
@@ -141,7 +206,8 @@ class Messenger extends Component {
     room.icons = ["exit"];
     room.chatHistory = [];
     myRooms.push(room);
-    this.setState({ myRooms });
+
+    this.setState({ myRooms, chooseRoom: room });
   };
 
   updateRoom = room => {
@@ -155,22 +221,11 @@ class Messenger extends Component {
     this.setState({ myRooms });
   };
 
-  getUsers = () => {
-    axios.get("https://randomuser.me/api/?results=15").then(response => {
-      let users = response.data.results.map(result => {
-        return {
-          photo: result.picture.large,
-          name: `${result.name.first} ${result.name.last}`,
-          text:
-            "Hello world! This is a long message that needs to be truncated."
-        };
-      });
-      this.setState({ users: users });
-    });
-  };
-
   handleExitAllRooms = () => {
-    this.setState({ myRooms: [] });
+    let myRooms = this.state.myRooms;
+    for (let myRoom of myRooms) {
+      this.handleExitRoom(room);
+    }
   };
 
   handleExitRoom = room => {
@@ -178,19 +233,31 @@ class Messenger extends Component {
     myRooms = myRooms.filter(myroom => myroom !== room);
     this.setState({ myRooms });
     let aRooms = this.state.aRooms;
-    room.icons = ["enter"];
     aRooms.push(room);
-    this.setState({ aRooms });
+
+    client.send(
+      JSON.stringify({
+        type: "exitRoom",
+        content: { name: room.name }
+      })
+    );
   };
 
   handleEnterRoom = room => {
     let aRooms = this.state.aRooms;
     aRooms = aRooms.filter(aroom => aroom !== room);
     this.setState({ aRooms });
-    let myRooms = this.state.myRooms;
-    room.icons = ["exit"];
-    myRooms.push(room);
-    this.setState({ myRooms });
+
+    client.send(
+      JSON.stringify({
+        type: "joinRoom",
+        content: { name: room.name }
+      })
+    );
+  };
+
+  clickMyRoom = room => {
+    this.setState({ chooseRoom: room });
   };
 
   render() {
@@ -203,6 +270,7 @@ class Messenger extends Component {
             changeCMRoomStatus={this.changeCMRoomStatus}
             handleExitAllRooms={this.handleExitAllRooms}
             handleExitRoom={this.handleExitRoom}
+            clickMyRoom={this.clickMyRoom}
           />
           <ARoomList
             rooms={this.state.aRooms}
@@ -213,14 +281,14 @@ class Messenger extends Component {
         </div>
 
         <div className="scrollable content">
-          <MessageList />
+          <MessageList messages={this.state.chooseRoom.chatHistory} />
         </div>
 
         {/* {this.changeCMRoomStatus("create")} */}
         {this.renderCMRoom()}
 
         <div className="scrollable sidebar">
-          <UserList users={this.state.users} title={"Users"} />
+          <UserList users={this.state.chooseRoom.users} title={"Users"} />
         </div>
       </div>
     );

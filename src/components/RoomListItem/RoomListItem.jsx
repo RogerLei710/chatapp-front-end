@@ -49,7 +49,7 @@ export default function RoomListItem(props) {
   };
 
   return (
-    <div className="room-list-item">
+    <div className="room-list-item" onClick={props.clickMyRoom}>
       <div className="room-info row">
         <div className="room-title col-lg-9">{name}</div>
         <div className="float-right"> {renderBtns()} </div>
