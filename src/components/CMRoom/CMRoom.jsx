@@ -1,20 +1,15 @@
 import React from "react";
 // import moment from "moment";
 
-export default function Login(props) {
+export default function CMRoom(props) {
   const title = props.title;
+  const handleCMRoom = props.submit;
   // Create Room
 
   // If not, prompt an error and stop submitting.
   const submitHandler = event => {
     event.preventDefault();
-    // event.target.className += " was-validated";
-    // if (this.checkPwd()) {
-    //   this.props.onSubmit(
-    //     { username: this.state.username, password: this.state.password },
-    //     "sign in"
-    //   );
-    // }
+    handleCMRoom("Create");
   };
 
   return (

@@ -6,7 +6,6 @@ import ARoomList from "../ARoomList/ARoomList";
 import MessageList from "../MessageList/MessageList";
 import UserList from "../UserList/UserList";
 import CMRoom from "../CMRoom/CMRoom";
-import Login from "../Login/Login";
 
 import "./Messenger.css";
 import axios from "axios";
@@ -16,75 +15,113 @@ let client;
 class Messenger extends Component {
   state = {
     CMStatus: "none",
-    myRooms: "arr",
-    aRooms: "arr",
-    users: "arr"
+    myRooms: [],
+    aRooms: [],
+    users: []
   };
 
   constructor(props) {
     super(props);
-    client = Login.getSocket();
-    client.send(
-      JSON.stringify({
-        type: "getAvailableRooms",
-        content: ""
-      })
-    );
-    client.onmessage = message => {
-      console.log(JSON.parse(message.data));
-    };
+    client = props.client;
+    this.handleMsg();
+
     // Don't call this.setState() here!
     // this.state = { status: "" };
-    this.getMyRooms();
-    this.getARooms();
     this.getUsers();
   }
 
-  handleCMRoom = status => {
+  handleMsg = () => {
+    client.send(
+      JSON.stringify({
+        type: "getAvailableRooms",
+        content: {}
+      })
+    );
+
+    client.onmessage = message => {
+      let res = JSON.parse(message.data);
+      switch (res.type) {
+        case "availableRooms":
+          this.getARooms(JSON.parse(res.content));
+          break;
+        case "success":
+          break;
+        case "newRoom":
+          this.addARoom(JSON.parse(res.content));
+          break;
+        case "createdRoom":
+          this.createMRoom(JSON.parse(res.content));
+          break;
+        default:
+          break;
+      }
+    };
+
+    client.onclose = message => {
+      console.log(message);
+    };
+  };
+
+  changeCMRoomStatus = status => {
     this.setState({ CMStatus: status });
   };
 
+  handleCMRoom = status => {
+    if (status === "Create") {
+      client.send(
+        JSON.stringify({
+          type: "createRoom",
+          content: {
+            name: "roger",
+            minAge: 20,
+            maxAge: 30,
+            continent: ["North America", "South America"],
+            school: ["Rice", "Tsinghua"]
+          }
+        })
+      );
+    }
+  };
+
   renderCMRoom = () => {
-    if (this.state.CMStatus !== "none") {
+    let CMStatus = this.state.CMStatus;
+    if (CMStatus !== "none") {
       return (
         <div className="absolute-create-room">
           <CMRoom
-            title={this.state.CMStatus}
-            cancel={() => this.handleCMRoom("none")}
+            title={CMStatus}
+            cancel={() => this.changeCMRoomStatus("none")}
+            submit={this.handleCMRoom}
           />
         </div>
       );
     }
   };
 
-  getMyRooms = () => {
-    axios.get("https://randomuser.me/api/?results=6").then(response => {
-      let i = 0;
-      let myRooms = response.data.results.map(result => {
-        i++;
-        return {
-          name: "Room " + i,
-          icons: i % 2 === 1 ? ["exit", "modify"] : ["exit"],
-          chatHistory: []
-        };
-      });
-      this.setState({ myRooms: myRooms });
-    });
+  getARooms = rooms => {
+    let aRooms = [];
+    for (let room of rooms) {
+      room.icons = ["enter"];
+      room.chatHistory = [];
+      aRooms.push(room);
+    }
+    this.setState({ aRooms });
   };
 
-  getARooms = () => {
-    axios.get("https://randomuser.me/api/?results=6").then(response => {
-      let i = 10;
-      let aRooms = response.data.results.map(result => {
-        i++;
-        return {
-          name: "Room " + i,
-          icons: ["enter"],
-          chatHistory: []
-        };
-      });
-      this.setState({ aRooms: aRooms });
-    });
+  addARoom = room => {
+    let aRooms = this.state.aRooms;
+    room.icons = ["enter"];
+    room.chatHistory = [];
+    aRooms.push(room);
+    this.setState({ aRooms });
+  };
+
+  createMRoom = room => {
+    let myRooms = this.state.myRooms;
+    room.icons = ["exit", "modify"];
+    room.chatHistory = [];
+    myRooms.push(room);
+    this.setState({ myRooms });
   };
 
   getUsers = () => {
@@ -126,26 +163,20 @@ class Messenger extends Component {
   };
 
   render() {
-    if (
-      this.state.myRooms === "arr" ||
-      this.state.aRooms === "arr" ||
-      this.state.users === "arr"
-    )
-      return <div>loading</div>;
     return (
       <div className="messenger">
         <div className="scrollable sidebar">
           <MyRoomList
             rooms={this.state.myRooms}
             title={"My Rooms"}
-            handleCMRoom={this.handleCMRoom}
+            changeCMRoomStatus={this.changeCMRoomStatus}
             handleExitAllRooms={this.handleExitAllRooms}
             handleExitRoom={this.handleExitRoom}
           />
           <ARoomList
             rooms={this.state.aRooms}
             title={"Available Rooms"}
-            handleCMRoom={this.handleCMRoom}
+            changeCMRoomStatus={this.changeCMRoomStatus}
             handleEnterRoom={this.handleEnterRoom}
           />
         </div>
@@ -154,7 +185,7 @@ class Messenger extends Component {
           <MessageList />
         </div>
 
-        {/* {this.handleCMRoom("create")} */}
+        {/* {this.changeCMRoomStatus("create")} */}
         {this.renderCMRoom()}
 
         <div className="scrollable sidebar">

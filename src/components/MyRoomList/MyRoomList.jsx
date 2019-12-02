@@ -25,7 +25,7 @@ export default function MyRoomList(props) {
           <ToolbarButton
             key="cog"
             icon="ion-ios-add-circle-outline"
-            func={() => props.handleCMRoom("Create")}
+            func={() => props.changeCMRoomStatus("Create")}
             title="Create Room"
           />
         ]}
@@ -43,7 +43,7 @@ export default function MyRoomList(props) {
         <RoomListItem
           key={room.name + " list"}
           data={room}
-          handleCMRoom={() => props.handleCMRoom("Modify")}
+          changeCMRoomStatus={() => props.changeCMRoomStatus("Modify")}
           handleExitRoom={props.handleExitRoom}
         />
       ))}

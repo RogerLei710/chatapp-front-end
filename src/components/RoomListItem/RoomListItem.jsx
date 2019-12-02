@@ -38,7 +38,7 @@ export default function RoomListItem(props) {
           <ToolbarButton
             key={name + icon}
             icon="ion-ios-create"
-            func={props.handleCMRoom}
+            func={props.changeCMRoomStatus}
             title="Modify Room"
           />
         );

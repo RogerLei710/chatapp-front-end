@@ -1,41 +1,48 @@
 import React, { Component } from "react";
-import { w3cwebsocket as W3CWebSocket } from "websocket";
 
-const client = new W3CWebSocket("ws://localhost:4567/chatapp");
+let client;
 
 class Login extends Component {
-  state = {};
+  state = {
+    name: "",
+    age: "",
+    continent: "",
+    school: "",
+    warning: ""
+  };
 
   constructor(props) {
     super(props);
-    client.onopen = () => {
-      console.log("WebSocket Client Connected");
-    };
+    client = props.client;
     client.onmessage = message => {
-      console.log(JSON.parse(message.data));
+      let res = JSON.parse(message.data);
+      if (res.type === "success") {
+        this.props.history.push({
+          pathname: "/main"
+        });
+      } else {
+        this.setState({ warning: "User name already exists!" });
+      }
     };
   }
 
-  // return websocket to main page
-  getSocket() {
-    return client;
-  }
-
-  handleSumbit = () => {
+  handleSumbit = event => {
+    event.preventDefault();
     client.send(
       JSON.stringify({
         type: "createProfile",
         content: {
-          name: "roger",
-          age: 25,
-          continent: "North America",
-          school: "Rice University"
+          name: this.state.name,
+          age: this.state.age,
+          continent: this.state.continent,
+          school: this.state.school
         }
       })
     );
-    this.props.history.push({
-      pathname: "/main"
-    });
+  };
+
+  changeHandler = event => {
+    this.setState({ [event.target.name]: event.target.value });
   };
 
   render() {
@@ -57,52 +64,60 @@ class Login extends Component {
 
               <div className="form-label-group">
                 <label htmlFor="inputUsername text-center">Username</label>
+                <span name="warning" className="text-danger ml-2">
+                  {this.state.warning}
+                </span>
                 <input
-                  id="inputUsername"
                   className="form-control"
                   placeholder="Username"
-                  required=""
-                  autoFocus=""
+                  required
+                  name="name"
+                  onChange={this.changeHandler}
                 ></input>
               </div>
               <div className="form-label-group">
                 <label htmlFor="inputAge">Age</label>
                 <input
-                  id="inputAge"
                   className="form-control"
                   placeholder="Age"
-                  required=""
+                  required
+                  name="age"
+                  onChange={this.changeHandler}
                 ></input>
               </div>
 
               <div className="form-label-group">
                 <label htmlFor="inputRegion">Region</label>
                 <select
-                  className="multiple custom-select"
-                  id="inputGroupSelect01"
+                  className="custom-select"
+                  required
+                  name="continent"
+                  onChange={this.changeHandler}
                 >
-                  <option defaultValue>Choose...</option>
-                  <option value="1">North America</option>
-                  <option value="2">South America</option>
-                  <option value="3">Asia</option>
-                  <option value="4">Ocean</option>
-                  <option value="5">Europe</option>
-                  <option value="6">Africa</option>
+                  <option value="">Choose...</option>
+                  <option value="North America">North America</option>
+                  <option value="South America">South America</option>
+                  <option value="Asia">Asia</option>
+                  <option value="Ocean">Ocean</option>
+                  <option value="Europe">Europe</option>
+                  <option value="Africa">Africa</option>
                 </select>
               </div>
 
               <div className="form-label-group">
                 <label htmlFor="inputSchool">School</label>
                 <select
-                  className="multiple custom-select"
-                  id="inputGroupSelect02"
+                  className="custom-select"
+                  required
+                  name="school"
+                  onChange={this.changeHandler}
                 >
-                  <option defaultValue>Choose...</option>
-                  <option value="1">Rice</option>
-                  <option value="2">Tsinghua</option>
-                  <option value="3">Stanford</option>
-                  <option value="4">UESTC</option>
-                  <option value="5">Zhejiang</option>
+                  <option value="">Choose...</option>
+                  <option value="Rice">Rice</option>
+                  <option value="Tsinghua">Tsinghua</option>
+                  <option value="Stanford">Stanford</option>
+                  <option value="UESTC">UESTC</option>
+                  <option value="Zhejiang">Zhejiang</option>
                 </select>
               </div>
 
