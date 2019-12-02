@@ -50,7 +50,19 @@ class Messenger extends Component {
           this.addARoom(JSON.parse(res.content));
           break;
         case "createdRoom":
-          this.createMRoom(JSON.parse(res.content));
+          this.createRoom(JSON.parse(res.content));
+          break;
+        case "joinedRoom":
+          this.joinRoom(JSON.parse(res.content));
+          break;
+        case "userJoin":
+          this.updateRoom(JSON.parse(res.content));
+          break;
+        case "exitedRoom":
+          this.exitRoom(JSON.parse(res.content));
+          break;
+        case "userExit":
+          this.updateRoom(JSON.parse(res.content));
           break;
         default:
           break;
@@ -116,11 +128,30 @@ class Messenger extends Component {
     this.setState({ aRooms });
   };
 
-  createMRoom = room => {
+  createRoom = room => {
     let myRooms = this.state.myRooms;
     room.icons = ["exit", "modify"];
     room.chatHistory = [];
     myRooms.push(room);
+    this.setState({ myRooms });
+  };
+
+  joinRoom = room => {
+    let myRooms = this.state.myRooms;
+    room.icons = ["exit"];
+    room.chatHistory = [];
+    myRooms.push(room);
+    this.setState({ myRooms });
+  };
+
+  updateRoom = room => {
+    let myRooms = this.state.myRooms;
+    for (let myroom of myRooms) {
+      if (myroom.name === room.name) {
+        myroom.users = room.users;
+        break;
+      }
+    }
     this.setState({ myRooms });
   };
 
