@@ -92,13 +92,12 @@ class Login extends Component {
                   required
                   name="continent"
                   onChange={this.changeHandler}
+                  defaultValue="North America"
                 >
                   <option value="" disabled>
                     Choose...
                   </option>
-                  <option value="North America" selected>
-                    North America
-                  </option>
+                  <option value="North America">North America</option>
                   <option value="South America">South America</option>
                   <option value="Asia">Asia</option>
                   <option value="Ocean">Ocean</option>
@@ -114,13 +113,12 @@ class Login extends Component {
                   required
                   name="school"
                   onChange={this.changeHandler}
+                  defaultValue="Rice"
                 >
                   <option value="" disabled>
                     Choose...
                   </option>
-                  <option value="Rice" selected>
-                    Rice
-                  </option>
+                  <option value="Rice">Rice</option>
                   <option value="Tsinghua">Tsinghua</option>
                   <option value="Stanford">Stanford</option>
                   <option value="MIT">MIT</option>

@@ -56,8 +56,11 @@ class Messenger extends Component {
         case "userJoin":
           this.updateRoom(JSON.parse(res.content));
           break;
-        case "exitedRoom":
-          this.exitRoom(JSON.parse(res.content));
+        case "roomDismiss":
+          this.roomDismiss(JSON.parse(res.content));
+          break;
+        case "ownerExit":
+          this.ownerExit(JSON.parse(res.content));
           break;
         case "userExit":
           this.updateRoom(JSON.parse(res.content));
@@ -223,7 +226,7 @@ class Messenger extends Component {
 
   handleExitAllRooms = () => {
     let myRooms = this.state.myRooms;
-    for (let myRoom of myRooms) {
+    for (let room of myRooms) {
       this.handleExitRoom(room);
     }
   };
@@ -231,9 +234,9 @@ class Messenger extends Component {
   handleExitRoom = room => {
     let myRooms = this.state.myRooms;
     myRooms = myRooms.filter(myroom => myroom !== room);
-    this.setState({ myRooms });
     let aRooms = this.state.aRooms;
     aRooms.push(room);
+    this.setState({ myRooms, aRooms });
 
     client.send(
       JSON.stringify({
@@ -258,6 +261,18 @@ class Messenger extends Component {
 
   clickMyRoom = room => {
     this.setState({ chooseRoom: room });
+  };
+
+  roomDismiss = room => {
+    let aRooms = this.state.aRooms;
+    aRooms = aRooms.filter(aroom => aroom !== room);
+    this.setState({ aRooms });
+  };
+
+  ownerExit = room => {
+    let myRooms = this.state.myRooms;
+    myRooms = myRooms.filter(myroom => myroom !== room);
+    this.setState({ myRooms });
   };
 
   render() {
