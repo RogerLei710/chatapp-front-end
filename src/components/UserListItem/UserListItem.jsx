@@ -4,11 +4,11 @@ import "./UserListItem.css";
 
 export default function UserListItem(props) {
   const { name } = props.data;
-  const avatar =
+  const avatarURL =
     "https://ui-avatars.com/api/?color=fff&name=" +
     name +
     "&background=" +
-    HSL2RGB(Math.floor(Math.random() * 360));
+    HSL2RGB(name.charCodeAt(0));
 
   function HSL2RGB(h) {
     h /= 360;
@@ -54,7 +54,7 @@ export default function UserListItem(props) {
       }
       onClick={props.clickUser}
     >
-      <img className="user-photo" src={avatar} alt="user" />
+      <img className="user-photo" src={avatarURL} alt="user" />
       <div className="user-info">
         <h1 className="user-title">{name}</h1>
         {/* <p className="conversation-snippet">{ text }</p> */}

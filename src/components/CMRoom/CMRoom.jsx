@@ -6,8 +6,8 @@ class CMRoom extends Component {
     name: "",
     minAge: "",
     maxAge: "",
-    continent: [],
-    school: []
+    continent: ["North America"],
+    school: ["Rice"]
   };
   constructor(props) {
     super(props);
@@ -92,8 +92,11 @@ class CMRoom extends Component {
                   multiple="multiple"
                   onChange={event => this.changeContinent(event.target)}
                   required
+                  defaultValue={["North America"]}
                 >
-                  <option value="">Choose...</option>
+                  <option value="" disabled>
+                    Choose...
+                  </option>
                   <option value="North America">North America</option>
                   <option value="South America">South America</option>
                   <option value="Asia">Asia</option>
@@ -111,8 +114,11 @@ class CMRoom extends Component {
                   name="school"
                   multiple="multiple"
                   onChange={event => this.changeSchool(event.target)}
+                  defaultValue={["Rice"]}
                 >
-                  <option value="">Choose...</option>
+                  <option value="" disabled>
+                    Choose...
+                  </option>
                   <option value="Rice">Rice</option>
                   <option value="Tsinghua">Tsinghua</option>
                   <option value="Stanford">Stanford</option>

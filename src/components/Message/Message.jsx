@@ -12,10 +12,17 @@ export default function Message(props) {
 
       <div className="bubble-container">
         <div className="bubble" title={friendlyTimestamp}>
-          {data.message}
+          {isMine
+            ? "To " + data.otherSide + ": "
+            : "From " + data.otherSide + ": "}
+          <strong>{data.message}</strong>
         </div>
       </div>
-      <p className="bubble-container recieved">recieved</p>
+      {data.received === true ? (
+        <p className="bubble-container received">received</p>
+      ) : (
+        ""
+      )}
     </div>
   );
 }

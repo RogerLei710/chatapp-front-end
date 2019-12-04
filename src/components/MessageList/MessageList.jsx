@@ -35,7 +35,7 @@ export default function MessageList(props) {
   return (
     <div className="message-list">
       <Toolbar
-        title={props.title === "" ? "CHAOS" : props.title}
+        title={props.title === undefined ? "CHAOS" : props.title}
         rightItems={[
           <ToolbarButton key="contacts" icon="ion-ios-contacts" />,
           <ToolbarButton key="info" icon="ion-ios-information-circle-outline" />

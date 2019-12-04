@@ -12,7 +12,7 @@ class Compose extends Component {
 
   handleSendMSG = event => {
     // Number 13 is the "Enter" key on the keyboard
-    if (event.keyCode === 13 && !event.shiftKey) {
+    if (event.keyCode === 13 && !event.shiftKey && this.state.msg !== "") {
       // Cancel the default action, if needed
       event.preventDefault();
       let res = this.props.handleSendMSG(this.state.msg);

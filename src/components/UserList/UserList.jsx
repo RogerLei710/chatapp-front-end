@@ -7,6 +7,14 @@ import "./UserList.css";
 export default function Users(props) {
   const users = props.users;
   const title = props.title;
+  const myself = props.myself;
+
+  // if I am the owner of the room, create To All user.
+  if (users !== undefined && myself === users[0].name) {
+    users.unshift({
+      name: "To All"
+    });
+  }
 
   return (
     <div className="user-list scrollable">

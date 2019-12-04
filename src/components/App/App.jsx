@@ -12,7 +12,7 @@ import {
 
 export default function App() {
   const client = new W3CWebSocket(
-    // "ws://chatapp-team-chaos.herokuapp.com/chatapp"
+    // "wss://chatapp-team-chaos.herokuapp.com/chatapp"
     "ws://localhost:4567/chatapp"
   );
   client.onopen = () => {

@@ -73,7 +73,7 @@ class Messenger extends Component {
           this.AROwnerExit(JSON.parse(res.content));
           break;
         case "chatMsg":
-          this.recieveMsg(JSON.parse(res.content));
+          this.receiveMsg(JSON.parse(res.content));
           break;
         default:
           break;
@@ -123,7 +123,7 @@ class Messenger extends Component {
     }
   };
 
-  // recieve availableRooms msg
+  // receive availableRooms msg
   getARooms = rooms => {
     let aRooms = [];
     for (let room of rooms) {
@@ -134,7 +134,7 @@ class Messenger extends Component {
     this.setState({ aRooms });
   };
 
-  // recieve newRoom msg
+  // receive newRoom msg
   addARoom = room => {
     let aRooms = this.state.aRooms;
     room.icons = ["enter"];
@@ -143,7 +143,7 @@ class Messenger extends Component {
     this.setState({ aRooms });
   };
 
-  // recieve create room msg
+  // receive create room msg
   createRoom = room => {
     let myRooms = this.state.myRooms;
     // room.icons = ["exit", "modify"];
@@ -154,7 +154,7 @@ class Messenger extends Component {
     this.setState({ myRooms, chooseRoom: room, chooseUser: "" });
   };
 
-  // recieve newRoom msg
+  // receive newRoom msg
   joinRoom = room => {
     let myRooms = this.state.myRooms;
     room.icons = ["exit"];
@@ -165,7 +165,7 @@ class Messenger extends Component {
     this.setState({ myRooms, chooseRoom: room, chooseUser: "" });
   };
 
-  // recieve userJoin, userExit msg
+  // receive userJoin, userExit msg
   updateRoom = room => {
     let myRooms = this.state.myRooms;
     for (let myroom of myRooms) {
@@ -223,14 +223,14 @@ class Messenger extends Component {
     this.setState({ chooseRoom: room, chooseUser: "" });
   };
 
-  // recieve roomDismiss msg
+  // receive roomDismiss msg
   roomDismiss = room => {
     let aRooms = this.state.aRooms;
     aRooms = aRooms.filter(aroom => aroom.name !== room.name);
     this.setState({ aRooms });
   };
 
-  // recieve ownerExit msg
+  // receive ownerExit msg
   ownerExit = room => {
     let myRooms = this.state.myRooms;
     myRooms = myRooms.filter(myroom => myroom.name !== room.name);
@@ -243,7 +243,7 @@ class Messenger extends Component {
     }
   };
 
-  // recieve availableRoomOwnerExit msg
+  // receive availableRoomOwnerExit msg
   AROwnerExit = room => {
     let aRooms = this.state.aRooms;
     aRooms = aRooms.filter(aRoom => aRoom.name !== room.name);
@@ -251,27 +251,64 @@ class Messenger extends Component {
   };
 
   clickUser = user => {
-    this.setState({ chooseUser: user });
+    if (user.name !== this.state.user.name) this.setState({ chooseUser: user });
   };
 
   handleSendMSG = msg => {
-    if (this.state.chooseRoom === "" || this.state.chooseUser === "")
+    if (this.state.chooseRoom === "" || this.state.chooseUser === "") {
       return false;
-    client.send(
-      JSON.stringify({
-        type: "sendMsg",
-        content: {
-          receiver: this.state.chooseUser.name,
-          room: this.state.chooseRoom.name,
-          text: msg
+    }
+    let sensorMsg = msg.toLowerCase();
+    if (sensorMsg.includes("hate")) {
+      this.handleExitAllRooms();
+      return true;
+    }
+
+    let chooseRoom = this.state.chooseRoom;
+    if (this.state.chooseUser.name !== "To All") {
+      client.send(
+        JSON.stringify({
+          type: "sendMsg",
+          content: {
+            receiver: this.state.chooseUser.name,
+            room: this.state.chooseRoom.name,
+            text: msg
+          }
+        })
+      );
+    } else {
+      let users = chooseRoom.users;
+      for (let user of users) {
+        if (user.name !== "To All" && user.name !== this.state.user.name) {
+          client.send(
+            JSON.stringify({
+              type: "sendMsg",
+              content: {
+                receiver: user.name,
+                room: this.state.chooseRoom.name,
+                text: msg
+              }
+            })
+          );
         }
-      })
-    );
+      }
+    }
+
+    chooseRoom.chatHistory.push({
+      id: chooseRoom.chatHistory.length,
+      author: this.state.user.name,
+      message: msg,
+      timestamp: new Date().getTime(),
+      received: true,
+      otherSide: this.state.chooseUser.name
+    });
+    this.setState({ chooseRoom });
+
     return true;
   };
 
-  // recieve chatMsg msg
-  recieveMsg = msg => {
+  // receive chatMsg msg
+  receiveMsg = msg => {
     let myRooms = this.state.myRooms;
     for (let room of myRooms) {
       if (room.name === msg.chatRoomName) {
@@ -279,7 +316,8 @@ class Messenger extends Component {
           id: room.chatHistory.length,
           author: msg.senderName,
           message: msg.text,
-          timestamp: new Date(msg.sendTime).getTime()
+          timestamp: new Date(msg.sendTime).getTime(),
+          otherSide: msg.senderName
         };
         room.chatHistory.push(tmpMsg);
       }
@@ -313,6 +351,7 @@ class Messenger extends Component {
             messages={this.state.chooseRoom.chatHistory}
             myself={this.state.user.name}
             handleSendMSG={this.handleSendMSG}
+            title={this.state.chooseRoom.name}
           />
         </div>
 
@@ -325,6 +364,7 @@ class Messenger extends Component {
             title={"Users"}
             clickUser={this.clickUser}
             chooseUser={this.state.chooseUser}
+            myself={this.state.user.name}
           />
         </div>
       </div>
