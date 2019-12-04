@@ -10,7 +10,7 @@ export default function RoomListItem(props) {
   });
 
   const room = props.data;
-  const { photo, name, icons } = props.data;
+  const { isSelected, name, icons } = props.data;
   const btns = [];
 
   const renderBtns = () => {
@@ -49,9 +49,15 @@ export default function RoomListItem(props) {
   };
 
   return (
-    <div className="room-list-item" onClick={props.clickMyRoom}>
+    <div
+      className={["room-list-item", `${isSelected ? "bg-secondary" : ""}`].join(
+        " "
+      )}
+    >
       <div className="room-info row">
-        <div className="room-title col-lg-9">{name}</div>
+        <div className="room-title col-lg-9" onClick={props.clickMyRoom}>
+          {name}{" "}
+        </div>
         <div className="float-right"> {renderBtns()} </div>
       </div>
     </div>

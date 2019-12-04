@@ -65,6 +65,9 @@ class Messenger extends Component {
         case "userExit":
           this.updateRoom(JSON.parse(res.content));
           break;
+        case "availableRoomOwnerExit":
+          this.AROwnerExit(JSON.parse(res.content));
+          break;
         default:
           break;
       }
@@ -95,6 +98,7 @@ class Messenger extends Component {
         })
       );
     }
+    this.changeCMRoomStatus("none");
   };
 
   renderCMRoom = () => {
@@ -130,10 +134,12 @@ class Messenger extends Component {
     this.setState({ aRooms });
   };
 
+  // recieve create room msg
   createRoom = room => {
     let myRooms = this.state.myRooms;
     // room.icons = ["exit", "modify"];
     room.icons = ["exit"];
+    room.isSelected = true;
     room.chatHistory = [
       {
         id: 1,
@@ -201,6 +207,11 @@ class Messenger extends Component {
       }
     ];
     myRooms.push(room);
+    let prevChooseRoom = this.state.chooseRoom;
+    if (prevChooseRoom !== "") {
+      prevChooseRoom.isSelected = false;
+      this.setState({ chooseRoom: prevChooseRoom });
+    }
     this.setState({ myRooms, chooseRoom: room });
   };
 
@@ -208,7 +219,13 @@ class Messenger extends Component {
     let myRooms = this.state.myRooms;
     room.icons = ["exit"];
     room.chatHistory = [];
+    room.isSelected = true;
     myRooms.push(room);
+    let prevChooseRoom = this.state.chooseRoom;
+    if (prevChooseRoom !== "") {
+      prevChooseRoom.isSelected = false;
+      this.setState({ chooseRoom: prevChooseRoom });
+    }
 
     this.setState({ myRooms, chooseRoom: room });
   };
@@ -239,7 +256,9 @@ class Messenger extends Component {
     aRooms.push(room);
     this.setState({ myRooms, aRooms });
     if (myRooms.length > 0) {
-      this.setState({ chooseRoom: myRooms[0] });
+      let chooseRoom = this.state.myRooms[0];
+      chooseRoom.isSelected = true;
+      this.setState({ chooseRoom });
     } else {
       this.setState({ chooseRoom: "" });
     }
@@ -266,6 +285,10 @@ class Messenger extends Component {
   };
 
   clickMyRoom = room => {
+    let chooseRoom = this.state.chooseRoom;
+    chooseRoom.isSelected = false;
+    this.setState({ chooseRoom });
+    room.isSelected = true;
     this.setState({ chooseRoom: room });
   };
 
@@ -280,10 +303,18 @@ class Messenger extends Component {
     myRooms = myRooms.filter(myroom => myroom.name !== room.name);
     this.setState({ myRooms });
     if (myRooms.length > 0) {
-      this.setState({ chooseRoom: myRooms[0] });
+      let chooseRoom = this.state.myRooms[0];
+      chooseRoom.isSelected = true;
+      this.setState({ chooseRoom });
     } else {
       this.setState({ chooseRoom: "" });
     }
+  };
+
+  AROwnerExit = room => {
+    let aRooms = this.state.aRooms;
+    aRooms = aRooms.filter(aRoom => aRoom.name !== room.name);
+    this.setState({ aRooms });
   };
 
   render() {
