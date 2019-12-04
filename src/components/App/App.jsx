@@ -11,7 +11,10 @@ import {
 } from "react-router-dom";
 
 export default function App() {
-  const client = new W3CWebSocket("ws://localhost:4567/chatapp");
+  const client = new W3CWebSocket(
+    // "ws://chatapp-team-chaos.herokuapp.com/chatapp"
+    "ws://localhost:4567/chatapp"
+  );
   client.onopen = () => {
     console.log("WebSocket Client Connected");
   };

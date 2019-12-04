@@ -5,7 +5,7 @@
   background: white;
   border-top: 1px solid lightgray;
   position: fixed;
-  width: calc(100% - 20px);
+  width: 64%;
   bottom: 0px;
 }
 

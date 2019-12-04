@@ -12,17 +12,20 @@ import "./Messenger.css";
 let client;
 
 class Messenger extends Component {
-  state = {
-    CMStatus: "none",
-    myRooms: [],
-    aRooms: [],
-    chooseRoom: "",
-    chooseUser: ""
-  };
+  state = {};
 
   constructor(props) {
     super(props);
     client = props.client;
+    this.state = {
+      CMStatus: "none",
+      myRooms: [],
+      aRooms: [],
+      chooseRoom: "",
+      chooseUser: "",
+      user: props.location.state
+    };
+
     this.handleMsg();
 
     // Don't call this.setState() here!
@@ -68,6 +71,9 @@ class Messenger extends Component {
           break;
         case "availableRoomOwnerExit":
           this.AROwnerExit(JSON.parse(res.content));
+          break;
+        case "chatMsg":
+          this.recieveMsg(JSON.parse(res.content));
           break;
         default:
           break;
@@ -143,20 +149,7 @@ class Messenger extends Component {
     // room.icons = ["exit", "modify"];
     room.icons = ["exit"];
     room.isSelected = true;
-    room.chatHistory = [
-      {
-        id: 1,
-        author: "apple",
-        message: "Hello everyone, welcome to Chaos chat app!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 2,
-        author: "orange",
-        message: "<strong>Jessie:</strong> My name is Jessie!",
-        timestamp: new Date().getTime()
-      }
-    ];
+    room.chatHistory = [];
     myRooms.push(room);
     this.setState({ myRooms, chooseRoom: room, chooseUser: "" });
   };
@@ -261,6 +254,39 @@ class Messenger extends Component {
     this.setState({ chooseUser: user });
   };
 
+  handleSendMSG = msg => {
+    if (this.state.chooseRoom === "" || this.state.chooseUser === "")
+      return false;
+    client.send(
+      JSON.stringify({
+        type: "sendMsg",
+        content: {
+          receiver: this.state.chooseUser.name,
+          room: this.state.chooseRoom.name,
+          text: msg
+        }
+      })
+    );
+    return true;
+  };
+
+  // recieve chatMsg msg
+  recieveMsg = msg => {
+    let myRooms = this.state.myRooms;
+    for (let room of myRooms) {
+      if (room.name === msg.chatRoomName) {
+        let tmpMsg = {
+          id: room.chatHistory.length,
+          author: msg.senderName,
+          message: msg.text,
+          timestamp: new Date(msg.sendTime).getTime()
+        };
+        room.chatHistory.push(tmpMsg);
+      }
+    }
+    this.setState(myRooms);
+  };
+
   render() {
     return (
       <div className="messenger">
@@ -283,7 +309,11 @@ class Messenger extends Component {
         </div>
 
         <div className="scrollable content">
-          <MessageList messages={this.state.chooseRoom.chatHistory} />
+          <MessageList
+            messages={this.state.chooseRoom.chatHistory}
+            myself={this.state.user.name}
+            handleSendMSG={this.handleSendMSG}
+          />
         </div>
 
         {/* {this.changeCMRoomStatus("create")} */}

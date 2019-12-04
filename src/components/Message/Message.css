@@ -3,6 +3,10 @@
   flex-direction: column;
 }
 
+.recieved {
+  justify-content: flex-end;
+}
+
 .message .timestamp {
   display: flex;
   justify-content: center;

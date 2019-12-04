@@ -15,6 +15,7 @@ export default function Message(props) {
           {data.message}
         </div>
       </div>
+      <p className="bubble-container recieved">recieved</p>
     </div>
   );
 }

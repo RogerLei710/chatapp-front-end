@@ -18,7 +18,8 @@ class Login extends Component {
       let res = JSON.parse(message.data);
       if (res.type === "success") {
         this.props.history.push({
-          pathname: "/main"
+          pathname: "/main",
+          state: this.state
         });
       } else {
         this.setState({ warning: "User name already exists!" });
