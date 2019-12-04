@@ -16,7 +16,14 @@ export default function Users(props) {
       {users === undefined ? (
         <div></div>
       ) : (
-        users.map(user => <UserListItem key={user.name} data={user} />)
+        users.map(user => (
+          <UserListItem
+            key={user.name}
+            data={user}
+            clickUser={() => props.clickUser(user)}
+            chooseUser={props.chooseUser}
+          />
+        ))
       )}
     </div>
   );

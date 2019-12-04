@@ -16,7 +16,8 @@ class Messenger extends Component {
     CMStatus: "none",
     myRooms: [],
     aRooms: [],
-    chooseRoom: ""
+    chooseRoom: "",
+    chooseUser: ""
   };
 
   constructor(props) {
@@ -56,14 +57,14 @@ class Messenger extends Component {
         case "userJoin":
           this.updateRoom(JSON.parse(res.content));
           break;
+        case "userExit":
+          this.updateRoom(JSON.parse(res.content));
+          break;
         case "roomDismiss":
           this.roomDismiss(JSON.parse(res.content));
           break;
         case "ownerExit":
           this.ownerExit(JSON.parse(res.content));
-          break;
-        case "userExit":
-          this.updateRoom(JSON.parse(res.content));
           break;
         case "availableRoomOwnerExit":
           this.AROwnerExit(JSON.parse(res.content));
@@ -116,6 +117,7 @@ class Messenger extends Component {
     }
   };
 
+  // recieve availableRooms msg
   getARooms = rooms => {
     let aRooms = [];
     for (let room of rooms) {
@@ -126,6 +128,7 @@ class Messenger extends Component {
     this.setState({ aRooms });
   };
 
+  // recieve newRoom msg
   addARoom = room => {
     let aRooms = this.state.aRooms;
     room.icons = ["enter"];
@@ -152,84 +155,24 @@ class Messenger extends Component {
         author: "orange",
         message: "<strong>Jessie:</strong> My name is Jessie!",
         timestamp: new Date().getTime()
-      },
-      {
-        id: 3,
-        author: "orange",
-        message: "Jessie: So nice to chat with you!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 4,
-        author: "apple",
-        message:
-          "It is so nice to meet you. I am at Rice University. Do you know who I am? HAHAHAHAH. LOL. I want to have a chat with you.",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 5,
-        author: "apple",
-        message: "Do you like our design?",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 6,
-        author: "apple",
-        message:
-          "It looks like it wraps exactly as it is supposed to. Lets see what a reply looks like!",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 7,
-        author: "orange",
-        message:
-          "Yudai: I think team chaos has great API design for certain. Yes, I like it. Would really love to choose it and implement it.",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 8,
-        author: "orange",
-        message: "Neo: Do you wanna to join me to watch the movie Joker",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 9,
-        author: "apple",
-        message: "I heard that this movie is wonderful and meaningful.",
-        timestamp: new Date().getTime()
-      },
-      {
-        id: 10,
-        author: "orange",
-        message:
-          "Yang: I think so. I have watched it though. Maybe we could try another one?",
-        timestamp: new Date().getTime()
       }
     ];
     myRooms.push(room);
-    let prevChooseRoom = this.state.chooseRoom;
-    if (prevChooseRoom !== "") {
-      prevChooseRoom.isSelected = false;
-      this.setState({ chooseRoom: prevChooseRoom });
-    }
-    this.setState({ myRooms, chooseRoom: room });
+    this.setState({ myRooms, chooseRoom: room, chooseUser: "" });
   };
 
+  // recieve newRoom msg
   joinRoom = room => {
     let myRooms = this.state.myRooms;
     room.icons = ["exit"];
     room.chatHistory = [];
     room.isSelected = true;
     myRooms.push(room);
-    let prevChooseRoom = this.state.chooseRoom;
-    if (prevChooseRoom !== "") {
-      prevChooseRoom.isSelected = false;
-      this.setState({ chooseRoom: prevChooseRoom });
-    }
 
-    this.setState({ myRooms, chooseRoom: room });
+    this.setState({ myRooms, chooseRoom: room, chooseUser: "" });
   };
 
+  // recieve userJoin, userExit msg
   updateRoom = room => {
     let myRooms = this.state.myRooms;
     for (let myroom of myRooms) {
@@ -238,7 +181,7 @@ class Messenger extends Component {
         break;
       }
     }
-    this.setState({ myRooms });
+    this.setState({ myRooms, chooseUser: "" });
   };
 
   handleExitAllRooms = () => {
@@ -254,10 +197,9 @@ class Messenger extends Component {
     let aRooms = this.state.aRooms;
     room.icons = ["enter"];
     aRooms.push(room);
-    this.setState({ myRooms, aRooms });
+    this.setState({ myRooms, aRooms, chooseUser: "" });
     if (myRooms.length > 0) {
       let chooseRoom = this.state.myRooms[0];
-      chooseRoom.isSelected = true;
       this.setState({ chooseRoom });
     } else {
       this.setState({ chooseRoom: "" });
@@ -285,36 +227,38 @@ class Messenger extends Component {
   };
 
   clickMyRoom = room => {
-    let chooseRoom = this.state.chooseRoom;
-    chooseRoom.isSelected = false;
-    this.setState({ chooseRoom });
-    room.isSelected = true;
-    this.setState({ chooseRoom: room });
+    this.setState({ chooseRoom: room, chooseUser: "" });
   };
 
+  // recieve roomDismiss msg
   roomDismiss = room => {
     let aRooms = this.state.aRooms;
     aRooms = aRooms.filter(aroom => aroom.name !== room.name);
     this.setState({ aRooms });
   };
 
+  // recieve ownerExit msg
   ownerExit = room => {
     let myRooms = this.state.myRooms;
     myRooms = myRooms.filter(myroom => myroom.name !== room.name);
     this.setState({ myRooms });
-    if (myRooms.length > 0) {
+    if (myRooms.length > 0 && room.name === this.state.chooseRoom.name) {
       let chooseRoom = this.state.myRooms[0];
-      chooseRoom.isSelected = true;
       this.setState({ chooseRoom });
     } else {
       this.setState({ chooseRoom: "" });
     }
   };
 
+  // recieve availableRoomOwnerExit msg
   AROwnerExit = room => {
     let aRooms = this.state.aRooms;
     aRooms = aRooms.filter(aRoom => aRoom.name !== room.name);
     this.setState({ aRooms });
+  };
+
+  clickUser = user => {
+    this.setState({ chooseUser: user });
   };
 
   render() {
@@ -328,6 +272,7 @@ class Messenger extends Component {
             handleExitAllRooms={this.handleExitAllRooms}
             handleExitRoom={this.handleExitRoom}
             clickMyRoom={this.clickMyRoom}
+            chooseRoom={this.state.chooseRoom}
           />
           <ARoomList
             rooms={this.state.aRooms}
@@ -345,7 +290,12 @@ class Messenger extends Component {
         {this.renderCMRoom()}
 
         <div className="scrollable sidebar">
-          <UserList users={this.state.chooseRoom.users} title={"Users"} />
+          <UserList
+            users={this.state.chooseRoom.users}
+            title={"Users"}
+            clickUser={this.clickUser}
+            chooseUser={this.state.chooseUser}
+          />
         </div>
       </div>
     );

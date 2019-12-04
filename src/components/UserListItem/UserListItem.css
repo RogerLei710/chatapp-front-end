@@ -9,6 +9,13 @@
   cursor: pointer;
 }
 
+.user-list-item-selected {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: #c7c7c7;
+}
+
 .user-photo {
   width: 50px;
   height: 50px;

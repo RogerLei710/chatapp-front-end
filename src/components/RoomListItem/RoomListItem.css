@@ -6,8 +6,16 @@
 }
 
 .room-list-item:hover {
-  background: #eeeef1;
+  background: #f2f2f5;
   cursor: pointer;
+}
+
+.room-list-item-selected {
+  /* display: flex; */
+
+  align-items: center;
+  padding: 10px;
+  background: #c7c7c7;
 }
 
 .room-photo {

@@ -10,7 +10,7 @@ export default function RoomListItem(props) {
   });
 
   const room = props.data;
-  const { isSelected, name, icons } = props.data;
+  const { name, icons } = props.data;
   const btns = [];
 
   const renderBtns = () => {
@@ -50,9 +50,13 @@ export default function RoomListItem(props) {
 
   return (
     <div
-      className={["room-list-item", `${isSelected ? "bg-secondary" : ""}`].join(
-        " "
-      )}
+      className={
+        props.chooseRoom !== undefined &&
+        props.chooseRoom !== "" &&
+        name === props.chooseRoom.name
+          ? "room-list-item-selected"
+          : "room-list-item"
+      }
     >
       <div className="room-info row">
         <div className="room-title col-lg-9" onClick={props.clickMyRoom}>

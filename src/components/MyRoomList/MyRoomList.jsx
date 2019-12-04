@@ -46,6 +46,7 @@ export default function MyRoomList(props) {
           changeCMRoomStatus={() => props.changeCMRoomStatus("Modify")}
           handleExitRoom={props.handleExitRoom}
           clickMyRoom={() => props.clickMyRoom(room)}
+          chooseRoom={props.chooseRoom}
         />
       ))}
     </div>

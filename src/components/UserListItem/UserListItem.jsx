@@ -4,10 +4,56 @@ import "./UserListItem.css";
 
 export default function UserListItem(props) {
   const { name } = props.data;
-  const avatar = "https://ui-avatars.com/api/?name=" + name;
+  const avatar =
+    "https://ui-avatars.com/api/?color=fff&name=" +
+    name +
+    "&background=" +
+    HSL2RGB(Math.floor(Math.random() * 360));
+
+  function HSL2RGB(h) {
+    h /= 360;
+    let rgb = [];
+    let strColor = "";
+    rgb.push(h + 1 / 3);
+    rgb.push(h);
+    rgb.push(h - 1 / 3);
+    for (let i = 0; i < rgb.length; i++) {
+      let tc = rgb[i];
+      if (tc < 0) {
+        tc = tc + 1;
+      } else if (tc > 1) {
+        tc = tc - 1;
+      }
+      switch (true) {
+        case tc < 1 / 6:
+          tc = 6 * tc;
+          break;
+        case 1 / 6 <= tc && tc < 0.5:
+          tc = 1;
+          break;
+        case 0.5 <= tc && tc < 2 / 3:
+          tc = 4 - 6 * tc;
+          break;
+        default:
+          tc = 0;
+          break;
+      }
+      rgb[i] = Math.round(tc * 255);
+      let hexString = rgb[i].toString(16);
+      strColor += hexString.length == 1 ? "0" + hexString : hexString;
+    }
+    return strColor;
+  }
 
   return (
-    <div className="user-list-item">
+    <div
+      className={
+        props.chooseUser !== "" && props.chooseUser.name === name
+          ? "user-list-item-selected"
+          : "user-list-item"
+      }
+      onClick={props.clickUser}
+    >
       <img className="user-photo" src={avatar} alt="user" />
       <div className="user-info">
         <h1 className="user-title">{name}</h1>
