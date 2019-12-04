@@ -235,8 +235,14 @@ class Messenger extends Component {
     let myRooms = this.state.myRooms;
     myRooms = myRooms.filter(myroom => myroom !== room);
     let aRooms = this.state.aRooms;
+    room.icons = ["enter"];
     aRooms.push(room);
     this.setState({ myRooms, aRooms });
+    if (myRooms.length > 0) {
+      this.setState({ chooseRoom: myRooms[0] });
+    } else {
+      this.setState({ chooseRoom: "" });
+    }
 
     client.send(
       JSON.stringify({
@@ -265,14 +271,19 @@ class Messenger extends Component {
 
   roomDismiss = room => {
     let aRooms = this.state.aRooms;
-    aRooms = aRooms.filter(aroom => aroom !== room);
+    aRooms = aRooms.filter(aroom => aroom.name !== room.name);
     this.setState({ aRooms });
   };
 
   ownerExit = room => {
     let myRooms = this.state.myRooms;
-    myRooms = myRooms.filter(myroom => myroom !== room);
+    myRooms = myRooms.filter(myroom => myroom.name !== room.name);
     this.setState({ myRooms });
+    if (myRooms.length > 0) {
+      this.setState({ chooseRoom: myRooms[0] });
+    } else {
+      this.setState({ chooseRoom: "" });
+    }
   };
 
   render() {
