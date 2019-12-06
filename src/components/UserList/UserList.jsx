@@ -9,10 +9,10 @@ export default function Users(props) {
   const title = props.title;
   const myself = props.myself;
 
-  // if I am the owner of the room, create To All user.
+  // if I am the owner of the room, create All user.
   if (users !== undefined && myself === users[0].name) {
     users.unshift({
-      name: "To All"
+      name: "All"
     });
   }
 

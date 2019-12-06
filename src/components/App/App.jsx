@@ -12,8 +12,8 @@ import {
 
 export default function App() {
   const client = new W3CWebSocket(
-    // "wss://chatapp-team-chaos.herokuapp.com/chatapp"
-    "ws://localhost:4567/chatapp"
+    "wss://chatapp-team-chaos.herokuapp.com/chatapp"
+    // "ws://localhost:4567/chatapp"
   );
   client.onopen = () => {
     console.log("WebSocket Client Connected");

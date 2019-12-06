@@ -4,11 +4,17 @@ import "./UserListItem.css";
 
 export default function UserListItem(props) {
   const { name } = props.data;
+  let value = 0;
+  for (let i = 0; i < name.length; i++) {
+    value += name.charCodeAt(i);
+  }
+  value = (value % 30) * 12;
+
   const avatarURL =
     "https://ui-avatars.com/api/?color=fff&name=" +
     name +
     "&background=" +
-    HSL2RGB(name.charCodeAt(0));
+    HSL2RGB(value);
 
   function HSL2RGB(h) {
     h /= 360;

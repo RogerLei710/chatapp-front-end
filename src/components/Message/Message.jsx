@@ -8,14 +8,18 @@ export default function Message(props) {
   const friendlyTimestamp = moment(data.timestamp).format("LLLL");
   return (
     <div className={["message", `${isMine ? "mine" : ""}`].join(" ")}>
-      {showTimestamp && <div className="timestamp">{friendlyTimestamp}</div>}
+      {(showTimestamp || data.author === "NOTIFICATION") && (
+        <div className="timestamp">
+          {data.author === "NOTIFICATION" ? data.timestamp : friendlyTimestamp}
+        </div>
+      )}
 
       <div className="bubble-container">
         <div className="bubble" title={friendlyTimestamp}>
           {isMine
             ? "To " + data.otherSide + ": "
             : "From " + data.otherSide + ": "}
-          <strong>{data.message}</strong>
+          <strong>{data.author === "NOTIFICATION" ? "" : data.message}</strong>
         </div>
       </div>
       {data.received === true ? (

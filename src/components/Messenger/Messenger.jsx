@@ -30,6 +30,16 @@ class Messenger extends Component {
 
     // Don't call this.setState() here!
     // this.state = { status: "" };
+
+    // Inorder to keep connected in heroku, send useless msg every 10 seconds
+    setInterval(() => {
+      client.send(
+        JSON.stringify({
+          type: "heartBeat",
+          content: {}
+        })
+      );
+    }, 10000);
   }
 
   handleMsg = () => {
@@ -62,6 +72,15 @@ class Messenger extends Component {
           break;
         case "userExit":
           this.updateRoom(JSON.parse(res.content));
+          this.showLeave("leave", JSON.parse(res.content));
+          break;
+        case "hateExit":
+          this.updateRoom(JSON.parse(res.content));
+          this.showLeave("hate", JSON.parse(res.content));
+          break;
+        case "userClose":
+          this.updateRoom(JSON.parse(res.content));
+          this.showLeave("lose", JSON.parse(res.content));
           break;
         case "roomDismiss":
           this.roomDismiss(JSON.parse(res.content));
@@ -182,6 +201,7 @@ class Messenger extends Component {
     for (let room of myRooms) {
       this.handleExitRoom(room);
     }
+    this.setState({ myRooms: [], chooseRoom: "", chooseUser: "" });
   };
 
   handleExitRoom = room => {
@@ -261,11 +281,19 @@ class Messenger extends Component {
     let sensorMsg = msg.toLowerCase();
     if (sensorMsg.includes("hate")) {
       this.handleExitAllRooms();
+      client.send(
+        JSON.stringify({
+          type: "hateExit",
+          content: {
+            name: this.state.chooseRoom.name
+          }
+        })
+      );
       return true;
     }
 
     let chooseRoom = this.state.chooseRoom;
-    if (this.state.chooseUser.name !== "To All") {
+    if (this.state.chooseUser.name !== "All") {
       client.send(
         JSON.stringify({
           type: "sendMsg",
@@ -279,7 +307,7 @@ class Messenger extends Component {
     } else {
       let users = chooseRoom.users;
       for (let user of users) {
-        if (user.name !== "To All" && user.name !== this.state.user.name) {
+        if (user.name !== "All" && user.name !== this.state.user.name) {
           client.send(
             JSON.stringify({
               type: "sendMsg",
@@ -323,6 +351,44 @@ class Messenger extends Component {
       }
     }
     this.setState(myRooms);
+  };
+
+  // receive leave msg
+  showLeave = (reason, info) => {
+    let roomName = info.roomName;
+    let userName = info.userName;
+    let myRooms = this.state.myRooms;
+
+    for (let room of myRooms) {
+      if (room.name === roomName) {
+        if (reason === "hate") {
+          room.chatHistory.push({
+            id: room.chatHistory.length,
+            author: "NOTIFICATION",
+            message: "",
+            timestamp: userName + " left the room because of forbidden word.",
+            otherSide: "system"
+          });
+        } else if (reason === "leave") {
+          room.chatHistory.push({
+            id: room.chatHistory.length,
+            author: "NOTIFICATION",
+            message: "",
+            timestamp: userName + " voluntarily left the room.",
+            otherSide: "system"
+          });
+        } else if (reason === "lose") {
+          room.chatHistory.push({
+            id: room.chatHistory.length,
+            author: "NOTIFICATION",
+            message: "",
+            timestamp: userName + " left the room because of connection lose.",
+            otherSide: "system"
+          });
+        }
+      }
+    }
+    this.setState({ myRooms });
   };
 
   render() {
