@@ -280,15 +280,21 @@ class Messenger extends Component {
     }
     let sensorMsg = msg.toLowerCase();
     if (sensorMsg.includes("hate")) {
-      this.handleExitAllRooms();
-      client.send(
-        JSON.stringify({
-          type: "hateExit",
-          content: {
-            name: this.state.chooseRoom.name
-          }
-        })
-      );
+      let myRooms = this.state.myRooms;
+      let aRooms = this.state.aRooms;
+      for (let room of myRooms) {
+        client.send(
+          JSON.stringify({
+            type: "hateExit",
+            content: {
+              name: room.name
+            }
+          })
+        );
+        room.icons = ["enter"];
+        aRooms.push(room);
+      }
+      this.setState({ myRooms: [], aRooms, chooseRoom: "", chooseUser: "" });
       return true;
     }
 
